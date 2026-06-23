@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geeon Tech Solutions - Karaoke Mobile Offline App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Analytics Tracking -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background: #ffffff;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 10px;
+            height: 10px;
+            background: #6366f1;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.2s;
+        }
+
+        .cursor-follower {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #6366f1;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transition: transform 0.3s;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 5%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+        }
+
+        .navbar.scrolled {
+            padding: 15px 5%;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 5px 30px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #1f2937;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: #6366f1;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1%, transparent 1%);
+            background-size: 50px 50px;
+            animation: moveDots 20s linear infinite;
+        }
+
+        @keyframes moveDots {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text {
+            color: white;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-text h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .stat {
+            text-align: left;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: white;
+            color: #6366f1;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .hero-image {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* App Showcase Section */
+        .app-showcase {
+            padding: 100px 5%;
+            background: #f8fafc;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 60px;
+        }
+
+        .section-header h2 {
+            font-size: 2.8rem;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+
+        .section-header p {
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+
+        .single-app {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            transition: transform 0.3s;
+        }
+
+        .single-app:hover {
+            transform: translateY(-10px);
+        }
+
+        .app-preview {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-preview::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1%, transparent 1%);
+            background-size: 30px 30px;
+            animation: moveDots 15s linear infinite;
+        }
+
+        .app-icon-large {
+            font-size: 8rem;
+            position: relative;
+            z-index: 1;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .app-details {
+            padding: 60px;
+        }
+
+        .app-name-large {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 15px;
+        }
+
+        .app-platform-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #667eea15, #764ba215);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: #6366f1;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .app-description-large {
+            color: #6b7280;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .app-features {
+            margin: 30px 0;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #4b5563;
+        }
+
+        .feature-list li::before {
+            content: "✓";
+            color: #6366f1;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Download Button Wrapper */
+        .download-wrapper {
+            text-align: center;
+            margin: 30px 0 20px 0;
+            padding: 25px;
+            background: linear-gradient(135deg, #f0f4ff, #e8ecff);
+            border-radius: 20px;
+            border: 2px dashed #6366f1;
+        }
+
+        .download-btn-main {
+            display: inline-block;
+            padding: 18px 50px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .download-btn-main:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.6);
+        }
+
+        .download-sub {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 12px;
+        }
+
+        .download-sub span {
+            background: #e5e7eb;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        /* Remote Control Card */
+        .remote-control-card {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 20px 0 30px 0;
+            text-align: center;
+            border: 2px solid #6366f1;
+            transition: all 0.3s;
+        }
+
+        .remote-control-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .remote-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #6366f1;
+            margin-bottom: 10px;
+        }
+
+        .remote-description {
+            color: #cbd5e1;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .remote-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+            background: #6366f1;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .remote-link:hover {
+            background: #4f52e0;
+            transform: translateY(-2px);
+        }
+
+        /* Download Counter */
+        .download-counter {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .counter-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .counter-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-family: monospace;
+        }
+
+        .counter-number span {
+            font-size: 1rem;
+        }
+
+        .features-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 40px;
+            transition: all 0.3s;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .feature-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea15, #764ba215);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 20px;
+        }
+
+        .contact-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .contact-info {
+            padding: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .contact-form {
+            padding: 50px;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .footer {
+            background: #1f2937;
+            color: white;
+            padding: 60px 5% 30px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            background: #6366f1;
+        }
+
+        @media (max-width: 968px) {
+            .single-app {
+                grid-template-columns: 1fr;
+            }
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+            .hero-stats {
+                justify-content: center;
+            }
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="logo">Geeon Tech Solutions</div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#app">App</a>
+                <a href="#features">Features</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <div class="hero-text">
+                <div class="hero-badge">🚀 New Release</div>
+                <h1>Transform Your Digital Experience</h1>
+                <p>Geeon Tech Solutions we create an app for your convenience</p>
+                <a href="#app" class="cta-button">Explore The App →</a>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-number" id="totalDownloads">0</div>
+                        <div class="stat-label">Total Downloads</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">4.9</div>
+                        <div class="stat-label">App Rating</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">99%</div>
+                        <div class="stat-label">Satisfaction</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="100" y="100" width="300" height="300" rx="30" fill="rgba(255,255,255,0.2)"/>
+                    <rect x="150" y="150" width="200" height="200" rx="15" fill="rgba(255,255,255,0.3)"/>
+                    <circle cx="250" cy="250" r="50" fill="rgba(255,255,255,0.4)"/>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Single App Showcase -->
+    <section class="app-showcase" id="app">
+        <div class="section-header">
+            <h2>Our Application</h2>
+            <p>The first release from Geeon Tech Solutions - built with passion and precision</p>
+        </div>
+        
+        <div class="single-app">
+            <div class="app-preview">
+                <div class="app-icon-large">🎤</div>
+            </div>
+            <div class="app-details">
+                <h2 class="app-name-large">Karaoke Mobile Offline</h2>
+                <div class="app-platform-badge">📱 Android • Offline First</div>
+                <p class="app-description-large">
+                    Sing Your Heart Out, Anytime Anywhere. Geeon Karaoke is the ultimate mobile karaoke experience that puts a professional-grade singing studio in your pocket. With thousands of songs, real-time lyrics, and studio-quality audio effects, transform your smartphone into a personal karaoke stage.
+                </p>
+                
+                <div class="app-features">
+                    <h3 style="margin-bottom: 15px; color: #1f2937;">Key Features:</h3>
+                    <ul class="feature-list">
+                        <li>🎤 "Your Voice, Your Stage"</li>
+                        <li>🎧 "Karaoke, Reimagined"</li>
+                        <li>🎤 "Every Voice Deserves to Be Heard"</li>
+                        <li>🎵 "Turn Your Phone Into a Karaoke"</li>
+                        <li>📀 Latest Karaoke Songs Added Weekly</li>
+                    </ul>
+                </div>
+
+                <!-- ============================================ -->
+                <!-- DOWNLOAD BUTTON – Insert your APK link below -->
+                <!-- ============================================ -->
+                <div class="download-wrapper">
+                    <a href="https://your-server.com/karaoke.apk" class="download-btn-main" id="downloadBtn">
+                        📥 Download Karaoke App
+                    </a>
+                    <div class="download-sub">
+                        <span>📱 Android 5.0+</span>
+                        <span>📦 25 MB</span>
+                        <span>🔓 Free</span>
+                        <span>🌐 Works Offline</span>
+                    </div>
+                </div>
+
+                <!-- REMOTE CONTROL CARD -->
+                <div class="remote-control-card">
+                    <div class="remote-title">🎮 Remote Control Feature</div>
+                    <div class="remote-description">
+                        Control your karaoke experience from anywhere in the room! 
+                        Use your phone as a remote to control playback, volume, and lyrics.
+                    </div>
+                    <a href="#" class="remote-link" id="remoteLink" target="_blank">
+                        🎯 Connect Remote Control →
+                    </a>
+                </div>
+
+                <!-- Download Counter -->
+                <div class="download-counter">
+                    <div class="counter-label">Total Downloads</div>
+                    <div class="counter-number" id="downloadCount">0</div>
+                    <p style="font-size: 0.8rem; color: #6b7280; margin-top: 10px;">
+                        ⚡ Free download • No registration required • Works offline
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="section-header">
+            <h2>Why Choose Geeon Tech Solutions?</h2>
+            <p>We build apps that people love to use every day</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-item"><div class="feature-icon">🎨</div><h3>Beautiful Design</h3><p>Intuitive interfaces that users love</p></div>
+            <div class="feature-item"><div class="feature-icon">⚡</div><h3>Lightning Fast</h3><p>Optimized performance for seamless experience</p></div>
+            <div class="feature-item"><div class="feature-icon">🔒</div><h3>Secure & Private</h3><p>Enterprise-grade security to protect your data</p></div>
+            <div class="feature-item"><div class="feature-icon">🔄</div><h3>Regular Updates</h3><p>Constant improvements and new features</p></div>
+            <div class="feature-item"><div class="feature-icon">🌍</div><h3>Global Reach</h3><p>Available worldwide in multiple languages</p></div>
+            <div class="feature-item"><div class="feature-icon">💎</div><h3>Premium Support</h3><p>24/7 customer support for all users</p></div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+        <div class="contact-container">
+            <div class="contact-info">
+                <h3>Get in Touch</h3>
+                <p>Have questions about our app? We'd love to hear from you!</p>
+                <div class="contact-details">
+                    <div class="contact-item">📧 geeontech.solutions@gmail.com</div>
+                    <div class="contact-item">📱 +63</div>
+                    <div class="contact-item">📍 Philippines, D.C</div>
+                </div>
+            </div>
+            <div class="contact-form">
+                <form id="contactForm">
+                    <div class="form-group"><input type="text" placeholder="Your Name" required></div>
+                    <div class="form-group"><input type="email" placeholder="Your Email" required></div>
+                    <div class="form-group"><textarea rows="5" placeholder="Your Message" required></textarea></div>
+                    <button type="submit" class="submit-btn">Send Message →</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Geeon Tech Solutions</h4>
+                <p>Creating innovative apps that make a difference in people's lives.</p>
+                <div class="social-links">
+                    <a href="#">📘</a>
+                    <a href="#">🐦</a>
+                    <a href="#">📷</a>
+                    <a href="#">💼</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <a href="#home">Home</a>
+                <a href="#app">Our App</a>
+                <a href="#features">Features</a>
+                <a href="#contact">Contact</a>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Cookie Policy</a>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2024 Geeon Tech Solutions. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Download counter
+        let downloadCount = localStorage.getItem('karaokeDownloads') ? parseInt(localStorage.getItem('karaokeDownloads')) : 5000;
+        
+        function updateCounterDisplay() {
+            document.getElementById('downloadCount').innerHTML = formatNumber(downloadCount) + ' <span>downloads</span>';
+            document.getElementById('totalDownloads').innerHTML = formatNumber(downloadCount);
+        }
+        
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // =============================================
+        // DOWNLOAD BUTTON – increments counter on click
+        // =============================================
+        document.getElementById('downloadBtn').addEventListener('click', function(e) {
+            // If you want to actually navigate to the APK, keep the href.
+            // This just tracks the click.
+            downloadCount++;
+            localStorage.setItem('karaokeDownloads', downloadCount);
+            updateCounterDisplay();
+            
+            // Optional: Google Analytics tracking
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'download', { 
+                    'event_category': 'engagement', 
+                    'event_label': 'APK_Download',
+                    'value': downloadCount 
+                });
+            }
+            
+            console.log('📥 Download clicked! Total downloads:', downloadCount);
+        });
+        
+        // Remote control link
+        document.getElementById('remoteLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('🎮 Remote Control Feature\n\nOpen the Karaoke app on your phone, then use this link on another device to control playback, change songs, and adjust volume remotely!');
+            // REPLACE WITH YOUR ACTUAL REMOTE CONTROL LINK:
+            // window.location.href = "https://your-server.com/remote-control";
+        });
+        
+        updateCounterDisplay();
+        
+        // Auto-increment downloads (simulated activity)
+        setInterval(() => {
+            if (Math.random() < 0.2) {
+                downloadCount += Math.floor(Math.random() * 3) + 1;
+                localStorage.setItem('karaokeDownloads', downloadCount);
+                updateCounterDisplay();
+            }
+        }, 3600000);
+        
+        // Custom cursor
+        const cursor = document.querySelector('.cursor');
+        const follower = document.querySelector('.cursor-follower');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.transform = `translate(${e.clientX - 5}px, ${e.clientY - 5}px)`;
+            follower.style.transform = `translate(${e.clientX - 15}px, ${e.clientY - 15}px)`;
+        });
+        
+        // Navbar scroll
+        window.addEventListener('scroll', () => {
+            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+        });
+        
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+        
+        // Contact form
+        document.getElementById('contactForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Thank you for your message! We will get back to you within 24 hours.');
+            e.target.reset();
+        });
+        
+        // Animation on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.feature-item, .single-app, .remote-control-card, .download-wrapper').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
